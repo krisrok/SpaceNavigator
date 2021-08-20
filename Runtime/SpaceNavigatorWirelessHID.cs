@@ -57,6 +57,13 @@ namespace SpaceNavigatorDriver
             DebugLog("SpaceNavigatorWirelessHID : Register layout for SpaceNavigator Wireless productId:0xC652");
         }
 
+        // In the player, trigger the calling of our static constructor
+        // by having an empty method annotated with RuntimeInitializeOnLoadMethod.
+        [RuntimeInitializeOnLoadMethod]
+        static void Init()
+        {
+        }
+
         // When one of our custom devices is removed, we want to make sure that if
         // it is the '.current' device, we null out '.current'.
         public override unsafe void OnStateEvent(InputEventPtr eventPtr)
