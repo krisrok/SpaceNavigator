@@ -53,8 +53,15 @@ namespace SpaceNavigatorDriver
                 matches: new InputDeviceMatcher()
                     .WithInterface("HID")
                     .WithManufacturer("3Dconnexion.*")
-                    .WithCapability("productId", 0xC652));
-            DebugLog("SpaceNavigatorWirelessHID : Register layout for SpaceNavigator Wireless productId:0xC652");
+                    .WithCapability("productId", 0xC652)); // 3Dconnection Universal Receiver
+            DebugLog("SpaceNavigatorWirelessHID : Register layout for SpaceNavigator Wireless (wireless) productId:0xC652");
+
+            InputSystem.RegisterLayout<SpaceNavigatorWirelessHID>(
+                matches: new InputDeviceMatcher()
+                .WithInterface("HID")
+                .WithManufacturer("3Dconnexion.*")
+                .WithCapability("productId", 0xC62E)); // 3Dconnection Spacemouse Wireless
+            DebugLog("SpaceNavigatorWirelessHID : Register layout for SpaceNavigator Wireless (wired) productId:0xC62E");
         }
 
         // In the player, trigger the calling of our static constructor
