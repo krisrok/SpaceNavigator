@@ -30,8 +30,8 @@ namespace SpaceNavigatorDriver
         [InputControl(name = "translation/z", offset = 2, format = "SHRT", parameters = "scale=true, scaleFactor=-10")]
         [InputControl(name = "rotation", format = "VC3S", layout = "Vector3", displayName = "Rotation")] 
         [InputControl(name = "rotation/x", offset = 6, format = "SHRT", parameters = "scale=true, scaleFactor=-80")] 
-        [InputControl(name = "rotation/y", offset = 8, format = "SHRT", parameters = "scale=true, scaleFactor=80")] 
-        [InputControl(name = "rotation/z", offset = 10, format = "SHRT", parameters = "scale=true, scaleFactor=80")]
+        [InputControl(name = "rotation/z", offset = 8, format = "SHRT", parameters = "scale=true, scaleFactor=80")] 
+        [InputControl(name = "rotation/y", offset = 10, format = "SHRT", parameters = "scale=true, scaleFactor=80")]
         public ReportFormat1 report1;
 
         // 3rd report
@@ -53,8 +53,22 @@ namespace SpaceNavigatorDriver
                 matches: new InputDeviceMatcher()
                     .WithInterface("HID")
                     .WithManufacturer("3Dconnexion.*")
-                    .WithCapability("productId", 0xC652));
-            DebugLog("SpaceNavigatorWirelessHID : Register layout for SpaceNavigator Wireless productId:0xC652");
+                    .WithCapability("productId", 0xC652)); // 3Dconnection Universal Receiver
+            DebugLog("SpaceNavigatorWirelessHID : Register layout for SpaceNavigator Wireless (wireless) productId:0xC652");
+
+            InputSystem.RegisterLayout<SpaceNavigatorWirelessHID>(
+                matches: new InputDeviceMatcher()
+                .WithInterface("HID")
+                .WithManufacturer("3Dconnexion.*")
+                .WithCapability("productId", 0xC62E)); // 3Dconnection Spacemouse Wireless
+            DebugLog("SpaceNavigatorWirelessHID : Register layout for SpaceNavigator Wireless (wired) productId:0xC62E");
+        }
+
+        // In the player, trigger the calling of our static constructor
+        // by having an empty method annotated with RuntimeInitializeOnLoadMethod.
+        [RuntimeInitializeOnLoadMethod]
+        static void Init()
+        {
         }
 
         // When one of our custom devices is removed, we want to make sure that if
