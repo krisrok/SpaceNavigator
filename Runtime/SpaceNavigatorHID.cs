@@ -229,9 +229,9 @@ namespace SpaceNavigatorDriver
 
         public static void DebugLog(string _message)
         {
-#if SPACENAVIGATOR_DEBUG
+//#if SPACENAVIGATOR_DEBUG
             Debug.Log(_message);
-#endif
+//#endif
         }
 
 #endregion
