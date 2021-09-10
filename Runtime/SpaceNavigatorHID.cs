@@ -190,6 +190,7 @@ namespace SpaceNavigatorDriver
 
         public void SetLEDStatus(LedStatus status)
         {
+            return;
             var cmd = LEDCommand.Create(status);
             var result = ExecuteCommand(ref cmd);
             DebugLog($"SpaceNavigatorHID : Executed LEDCommand. status = {status}, result = {result}");
