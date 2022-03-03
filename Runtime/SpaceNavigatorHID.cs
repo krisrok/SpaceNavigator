@@ -91,6 +91,9 @@ namespace SpaceNavigatorDriver
 
         private static void Quit()
         {
+            if (current == null)
+                return;
+
             current.SetLEDStatus(LedStatus.Off);
         }
         
