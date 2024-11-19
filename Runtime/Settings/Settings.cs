@@ -64,11 +64,19 @@ namespace SpaceNavigatorDriver {
 		public static bool RuntimeEditorNav = true;
 		public static bool RuntimeEditorNavSuspendOnGameViewFocus;
 
+		public static bool FlySwapRotationAxesYAndZ;
+
 		// Inversion
 		public static Vector3 FlyInvertTranslation, FlyInvertRotation;
 		public static Vector3 OrbitInvertTranslation, OrbitInvertRotation;
 		public static Vector3 TelekinesisInvertTranslation, TelekinesisInvertRotation;
 		public static Vector3 GrabMoveInvertTranslation, GrabMoveInvertRotation;
+
+		// Calibration
+		public const float TransSensEpsilonDefault = 11f;
+		public static float TransSensEpsilon = TransSensEpsilonDefault;
+		public const float RotSensEpsilonDefault = 11f;
+		public static float RotSensEpsilon = RotSensEpsilonDefault;
 
 		private static Vector2 _scrollPos;
 
@@ -232,6 +240,7 @@ namespace SpaceNavigatorDriver {
 			RuntimeEditorNav = GUILayout.Toggle(RuntimeEditorNav, "Runtime Editor Navigation");
 			EditorGUI.BeginDisabledGroup(!RuntimeEditorNav);
 			RuntimeEditorNavSuspendOnGameViewFocus = GUILayout.Toggle(RuntimeEditorNavSuspendOnGameViewFocus, "Suspend on GameView focus");
+			FlySwapRotationAxesYAndZ = GUILayout.Toggle(FlySwapRotationAxesYAndZ, "Swap Y and Z rotation axes in Fly mode");
 			EditorGUI.EndDisabledGroup();
 			GUILayout.EndHorizontal();
 			
@@ -316,6 +325,32 @@ namespace SpaceNavigatorDriver {
 			GUILayout.EndHorizontal();
 			#endregion - Axes inversion per mode -
 
+			#region - Deadzone -
+			GUILayout.Space(10);
+			GUILayout.BeginVertical();
+			GUILayout.Label("Deadzone");
+			GUILayout.Space(4);
+						
+			#region - Translation Epsilon -
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("Translation", GUILayout.Width(120));
+			int epsilonMax = 12;
+			int deadzone = epsilonMax - Mathf.RoundToInt(TransSensEpsilon);
+			TransSensEpsilon = epsilonMax - EditorGUILayout.IntSlider(deadzone, 0, epsilonMax);
+			GUILayout.EndHorizontal();			
+			#endregion - Translation Epsilon -
+			
+			#region - Rotation Epsilon -
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("Rotation", GUILayout.Width(120));
+			deadzone = epsilonMax - Mathf.RoundToInt(RotSensEpsilon);
+			RotSensEpsilon =epsilonMax -  EditorGUILayout.IntSlider(deadzone, 0, epsilonMax); 
+			GUILayout.EndHorizontal();
+			#endregion - Rotation Epsilon -
+
+			GUILayout.EndVertical();			
+			#endregion - Deadzone -
+
 			#region - Dead Zone -
 #if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
 		GUILayout.BeginVertical();
@@ -393,11 +428,15 @@ namespace SpaceNavigatorDriver {
 			// Runtime Editor Navigation
 			PlayerPrefs.SetInt("RuntimeEditorNav", RuntimeEditorNav ? 1 : 0);
 			PlayerPrefs.SetInt("RuntimeEditorNavWithFocussedGameView", RuntimeEditorNavSuspendOnGameViewFocus ? 1 : 0);
+			PlayerPrefs.SetInt("FlySwapRotationAxesYAndZ", FlySwapRotationAxesYAndZ ? 1 : 0);
 			// Axis Inversions
 			WriteAxisInversions(FlyInvertTranslation, FlyInvertRotation, "Fly");
 			WriteAxisInversions(OrbitInvertTranslation, OrbitInvertRotation, "Orbit");
 			WriteAxisInversions(TelekinesisInvertTranslation, TelekinesisInvertRotation, "Telekinesis");
 			WriteAxisInversions(GrabMoveInvertTranslation, GrabMoveInvertRotation, "Grab move");
+			// Calibration
+			PlayerPrefs.SetFloat("Translation sensitivity epsilon", TransSensEpsilon);
+			PlayerPrefs.SetFloat("Rotation sensitivity epsilon", RotSensEpsilon);
 		}
 
 		/// <summary>
@@ -434,11 +473,15 @@ namespace SpaceNavigatorDriver {
 			// Runtime Editor Navigation
 			RuntimeEditorNav = PlayerPrefs.GetInt("RuntimeEditorNav", 1) == 1;
 			RuntimeEditorNavSuspendOnGameViewFocus = PlayerPrefs.GetInt("RuntimeEditorNavWithFocussedGameView", 1) == 1;
+			FlySwapRotationAxesYAndZ = PlayerPrefs.GetInt("FlySwapRotationAxesYAndZ", 1) == 1;
 			// Axis Inversions
 			ReadAxisInversions(ref FlyInvertTranslation, ref FlyInvertRotation, "Fly");
 			ReadAxisInversions(ref OrbitInvertTranslation, ref OrbitInvertRotation, "Orbit");
 			ReadAxisInversions(ref TelekinesisInvertTranslation, ref TelekinesisInvertRotation, "Telekinesis");
 			ReadAxisInversions(ref GrabMoveInvertTranslation, ref GrabMoveInvertRotation, "Grab move");
+			// Calibration
+			TransSensEpsilon = PlayerPrefs.GetFloat("Translation sensitivity epsilon", TransSensEpsilonDefault);
+			RotSensEpsilon = PlayerPrefs.GetFloat("Rotation sensitivity epsilon", RotSensEpsilonDefault);
 		}
 
 		/// <summary>

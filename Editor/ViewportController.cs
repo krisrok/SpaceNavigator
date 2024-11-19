@@ -87,8 +87,8 @@ namespace SpaceNavigatorDriver
             _wasHorizonLocked = Settings.LockHorizon;
 
             // Return if device is idle.
-            if (SpaceNavigatorHID.current.Translation.ReadValue() == Vector3.zero &&
-                SpaceNavigatorHID.current.Rotation.ReadValue() == Vector3.zero)
+            if (ApproximatelyEqual(SpaceNavigatorHID.current.Translation.ReadValue(), Vector3.zero, Settings.TransSensEpsilon) &&
+                ApproximatelyEqual(SpaceNavigatorHID.current.Rotation.ReadValue(), Vector3.zero, Settings.RotSensEpsilon))
             {
                 _wasIdle = true;
                 return;
@@ -134,9 +134,17 @@ namespace SpaceNavigatorDriver
         {
             SyncRigWithScene();
 
+			var rotation = SpaceNavigatorHID.current.Rotation.ReadValue();
+
+			// Check to see if we need to swap rotation Y and Z for fly mode
+			if(Settings.FlySwapRotationAxesYAndZ)
+			{
+				rotation = new Vector3(rotation.x, rotation.z, rotation.y);
+			}
+
             // Apply inversion of axes for fly/grabmove mode.
             Vector3 translation = Vector3.Scale(SpaceNavigatorHID.current.Translation.ReadValue(), translationInversion);
-            Vector3 rotation = Vector3.Scale(SpaceNavigatorHID.current.Rotation.ReadValue(), rotationInversion);
+            rotation = Vector3.Scale(rotation, rotationInversion);
 
             // Apply sensitivity
             translation *= Settings.TransSens[Settings.CurrentGear];
@@ -431,6 +439,19 @@ namespace SpaceNavigatorDriver
         }
 
         #endregion - Snapping -
+        
+        #region - Deadzone -
+        
+        private static bool ApproximatelyEqual(Vector3 lhs, Vector3 rhs, float epsilon)
+        {
+            float num = lhs.x - rhs.x;
+            float num2 = lhs.y - rhs.y;
+            float num3 = lhs.z - rhs.z;
+            float num4 = num * num + num2 * num2 + num3 * num3;
+            return num4 < (9.99999944f * Mathf.Pow(10, -epsilon));
+        }
+
+        #endregion - Deadzone -
     }
 }
 #endif
