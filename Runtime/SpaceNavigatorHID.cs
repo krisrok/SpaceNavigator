@@ -1,15 +1,14 @@
 using System;
-using System.Collections;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.HID;
-using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
+#if SPACENAVIGATOR_DEBUG
+using System.Linq;
+#endif
 
 namespace SpaceNavigatorDriver
 {
@@ -30,6 +29,7 @@ namespace SpaceNavigatorDriver
         public ButtonControl Button2 { get; protected set; }
         public Vector3Control Rotation { get; protected set; }
         public Vector3Control Translation { get; protected set; }
+        public enum LedStatus { On, Off }
 
         protected override void FinishSetup()
         {
@@ -98,8 +98,13 @@ namespace SpaceNavigatorDriver
         internal static void DebugLog(string msg)
         {
 #if SPACENAVIGATOR_DEBUG
-            Debug.Log($"{nameof(SpaceNavigatorHID)}: {msg}");
+            UnityEngine.Debug.Log($"{nameof(SpaceNavigatorHID)}: {msg}");
 #endif
+        }
+
+        public void SetLEDStatus(LedStatus value)
+        {
+            throw new NotImplementedException();
         }
 
 #if SPACENAVIGATOR_DEBUG

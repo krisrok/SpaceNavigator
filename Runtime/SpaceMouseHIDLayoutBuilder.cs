@@ -61,6 +61,8 @@ namespace SpaceNavigatorDriver
                 stateSizeInBytes = reportCount * reportSize
             };
 
+            DebugLog(hidDescriptor.ToJson());
+
             // Process HID descriptor.
             var elements = hidDescriptor.elements;
             var elementCount = elements.Length;
