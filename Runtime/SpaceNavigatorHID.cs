@@ -6,6 +6,8 @@ using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.HID;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
+using System.Collections.Generic;
+
 #if SPACENAVIGATOR_DEBUG
 using System.Linq;
 #endif
@@ -29,6 +31,9 @@ namespace SpaceNavigatorDriver
         public ButtonControl Button2 { get; protected set; }
         public Vector3Control Rotation { get; protected set; }
         public Vector3Control Translation { get; protected set; }
+
+        private Dictionary<int, int> _reportSizeMap;
+
         public enum LedStatus { On, Off }
 
         protected override void FinishSetup()
@@ -39,6 +44,9 @@ namespace SpaceNavigatorDriver
             Button2 = GetChildControl<ButtonControl>("button2");
             Rotation = GetChildControl<Vector3Control>("rotation");
             Translation = GetChildControl<Vector3Control>("translation");
+
+            _reportSizeMap = HIDDeviceDescriptor.FromJson(description.capabilities)
+                .GetReportSizeMap(ReportCountMax);
         }
 
         public override void MakeCurrent()
@@ -71,20 +79,28 @@ namespace SpaceNavigatorDriver
             if (reportId < 1 || reportId > ReportCountMax)
                 return;
 
+            if (_reportSizeMap == null)
+                return;
+
             // Get pointer to current state.
             var newState = (byte*)currentStatePtr + stateBlock.byteOffset;
 
             // Merge incoming report into the current state.
             // Use reportId to map to a specific block inside the state struct.
             var offset = (uint)(ReportSizeMax * (reportId - 1));
+            var length2 = _reportSizeMap[reportId];
+            
             var length = stateEventPtr->stateSizeInBytes;
             var maxLength = (stateBlock.sizeInBits + 7) >> 3;
             // Make sure not to not exceed state block boundaries. Its size is not equal to the state's struct size!
             // Guess: Size might be calculated by last element offset + last element size, byte-aligned.
             if (offset + length > maxLength)
+            {
                 length = maxLength - offset;
-            UnsafeUtility.MemCpy(newState + offset, reportPtr, length);
-            //DebugLog($"Copied report {reportId} {stateEventPtr->stateSizeInBytes}:\n" + Hex(&newState, StateSizeMax, ReportSizeMax));
+            }
+
+            UnsafeUtility.MemCpy(newState + offset, reportPtr, length2);
+            DebugLog($"Copied report {reportId} {stateEventPtr->stateSizeInBytes}:\n" + Hex(&newState, StateSizeMax, ReportSizeMax));
 
             InputState.Change(this, *(MergedReports*)newState);
         }

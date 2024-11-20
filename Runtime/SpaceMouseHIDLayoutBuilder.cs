@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Utilities;
 using static UnityEngine.InputSystem.HID.HID;
+
 
 namespace SpaceNavigatorDriver
 {
@@ -61,8 +61,6 @@ namespace SpaceNavigatorDriver
                 stateSizeInBytes = reportCount * reportSize
             };
 
-            DebugLog(hidDescriptor.ToJson());
-
             // Process HID descriptor.
             var elements = hidDescriptor.elements;
             var elementCount = elements.Length;
@@ -74,7 +72,7 @@ namespace SpaceNavigatorDriver
                     continue;
 
                 var layout = element.DetermineLayout();
-                var usageString = HID.UsageToString(element.usagePage, element.usage);
+                var usageString = UsageToString(element.usagePage, element.usage);
                 if (layout != null)
                 {
                     // Check if the element should be placed inside a group control.

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
@@ -58,6 +60,19 @@ namespace SpaceNavigatorDriver
             }
 
             return hidDeviceDescriptor;
+        }
+
+        public static Dictionary<int, int> GetReportSizeMap(this HIDDeviceDescriptor hidDescriptor, int maxReportId = int.MaxValue)
+        {
+            return hidDescriptor.elements
+                .Where(e =>
+                    e.usagePage < UsagePage.VendorDefined && // Skip vendor-specific elements
+                    e.reportId <= maxReportId) // Skip less interesting reports (observed: 23, 27)
+                .GroupBy(e => e.reportId)
+                .OrderBy(g => g.Key)
+                .ToDictionary(
+                    g => g.Key,
+                    g => 1 + Mathf.CeilToInt(g.Sum(e => e.reportSizeInBits) / 8f)); // All elements' sizes aligned to bytes + 1 byte for reportId
         }
     }
 }

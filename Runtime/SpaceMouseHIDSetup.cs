@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -161,15 +162,8 @@ namespace SpaceNavigatorDriver
             }
 
             // TODO: Have a look at the skipped data, maybe we can use some of it.
-            var reportSizeMap = hidDescriptor.elements
-                .Where(e => 
-                    e.usagePage < UsagePage.VendorDefined && // Skip vendor-specific elements
-                    e.reportId <= SpaceNavigatorHID.ReportCountMax) // Skip less interesting reports (observed: 23, 27)
-                .GroupBy(e => e.reportId)
-                .OrderBy(g => g.Key)
-                .ToDictionary(
-                    g => g.Key,
-                    g => 1 + Mathf.CeilToInt(g.Sum(e => e.reportSizeInBits) / 8f)); // All elements' sizes aligned to bytes + 1 byte for reportId
+
+            Dictionary<int, int> reportSizeMap = hidDescriptor.GetReportSizeMap(SpaceNavigatorHID.ReportCountMax);
 
             // Check if reports are in a valid format to be mapped to our merged state struct
             if (reportSizeMap.Keys.Any(id => id < 1 || id > SpaceNavigatorHID.ReportCountMax) ||
