@@ -63,6 +63,33 @@ namespace SpaceNavigatorDriver
         {
             RemoveExistingLayout();
 
+            InputSystem.RegisterLayout(@"
+            {
+                ""name"" : ""SpaceMouse"",
+                ""controls"" : [
+                    {
+                        ""name"" : ""button1"",
+                        ""displayName"": ""Button 1"",
+                        ""layout"" : ""Button""
+                    },
+                    {
+                        ""name"" : ""button2"",
+                        ""displayName"": ""Button 2"",
+                        ""layout"" : ""Button""
+                    },
+                    {
+                        ""name"" : ""translation"",
+                        ""displayName"" : ""Translation"",
+                        ""layout"" : ""Vector3""
+                    },
+                    {
+                        ""name"" : ""rotation"",
+                        ""displayName"" : ""Rotation"",
+                        ""layout"" : ""Vector3""
+                    }
+                ]
+            }");
+            
             // Register our handler.
             DebugLog("Register onFindLayoutForDevice handler");
             InputSystem.onFindLayoutForDevice += InputSystem_onFindLayoutForDevice;
@@ -218,7 +245,7 @@ namespace SpaceNavigatorDriver
                 reportSize = SpaceNavigatorHID.ReportSizeMax
             };
             InputSystem.RegisterLayoutBuilder(() => layout.Build(),
-                layoutName, "HID", deviceMatcher);
+                layoutName, "SpaceMouse", deviceMatcher);
 
             return layoutName;
         }

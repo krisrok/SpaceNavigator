@@ -56,8 +56,8 @@ namespace SpaceNavigatorDriver
             {
                 displayName = displayName,
                 type = deviceType,
-                extendsLayout = "HID",
-                stateFormat = new FourCC('H', 'I', 'D'),
+                extendsLayout = "SpaceMouse",
+                stateFormat = new FourCC("HID"),
                 stateSizeInBytes = reportCount * reportSize
             };
 
